@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IntelliPrep — AI-Powered Exam Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#1A1F35;--bg2:#212840;--bg3:#2A3150;
+  --purple:#8B5CF6;--purple-l:#C4B5FD;--purple-d:#3D2875;
+  --blue:#60A5FA;--blue-d:#1E3A6E;
+  --mint:#34D399;--mint-d:#064E3B;
+  --amber:#FBBF24;--white:#EEF0FF;
+  --slate:#9CA3C8;--slate-d:#6B7499;
+  --card:#242B45;--cb:#323B5C;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--white);line-height:1.6;overflow-x:hidden}
+
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(26,31,53,.92);backdrop-filter:blur(12px);border-bottom:1px solid #323B5C}
+.logo{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.4rem;font-weight:800;background:linear-gradient(135deg,#C4B5FD,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo span{-webkit-text-fill-color:#34D399}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{color:#9CA3C8;text-decoration:none;font-size:.9rem;transition:color .2s}
+.nav-links a:hover{color:#C4B5FD}
+.nav-cta{display:flex;gap:.75rem}
+.btn-ghost{padding:.5rem 1.25rem;border-radius:8px;border:1px solid #323B5C;background:transparent;color:#EEF0FF;font-family:'Inter',sans-serif;font-size:.875rem;cursor:pointer;transition:border-color .2s}
+.btn-ghost:hover{border-color:#8B5CF6}
+.btn-primary{padding:.5rem 1.25rem;border-radius:8px;background:#8B5CF6;border:none;color:#fff;font-family:'Inter',sans-serif;font-size:.875rem;font-weight:600;cursor:pointer;transition:background .2s}
+.btn-primary:hover{background:#7C3AED}
+
+.hero{padding:5rem 3rem 4rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;max-width:1200px;margin:0 auto}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:.5rem;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.4);padding:.35rem .9rem;border-radius:999px;font-size:.8rem;color:#C4B5FD;font-family:'JetBrains Mono',monospace;margin-bottom:1.25rem}
+.hero-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:#34D399;display:inline-block}
+h1{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(2rem,4vw,3.25rem);font-weight:800;line-height:1.15;margin-bottom:1.25rem}
+h1 .ac{color:#C4B5FD}
+h1 .ac2{color:#34D399}
+.hero-sub{color:#9CA3C8;font-size:1.05rem;margin-bottom:2rem;max-width:480px}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap}
+.btn-lg{padding:.8rem 2rem;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer}
+.btn-lg.p{background:#8B5CF6;color:#fff;border:none;box-shadow:0 0 30px rgba(139,92,246,.4);transition:box-shadow .2s,transform .2s}
+.btn-lg.p:hover{box-shadow:0 0 45px rgba(139,92,246,.6);transform:translateY(-1px)}
+.btn-lg.s{background:transparent;color:#EEF0FF;border:1px solid #323B5C;transition:border-color .2s}
+.btn-lg.s:hover{border-color:#8B5CF6;color:#C4B5FD}
+.hero-stats{display:flex;gap:2rem;margin-top:2.5rem;padding-top:2rem;border-top:1px solid #323B5C}
+.stat-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.75rem;font-weight:800}
+.stat-label{font-size:.8rem;color:#9CA3C8}
+
+.hero-demo{background:#242B45;border:1px solid #323B5C;border-radius:16px;padding:1.5rem;box-shadow:0 8px 40px rgba(0,0,0,.3)}
+.demo-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid #323B5C}
+.demo-icon{width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;font-size:1rem}
+.demo-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:.95rem;font-weight:700;color:#EEF0FF}
+.demo-sub{font-size:.75rem;color:#9CA3C8}
+.demo-badge{margin-left:auto;background:rgba(52,211,153,.15);color:#34D399;font-size:.7rem;font-family:'JetBrains Mono',monospace;padding:.2rem .65rem;border-radius:999px;border:1px solid rgba(52,211,153,.3)}
+
+/* CUBE */
+.cube-scene{height:280px;overflow:hidden;position:relative;border-radius:10px;margin-bottom:.9rem}
+.cube-face{position:absolute;top:0;left:0;width:100%;height:100%;background:#2A3150;border:1px solid #323B5C;border-radius:10px;padding:1rem 1.1rem;display:flex;flex-direction:column;transition:transform .6s cubic-bezier(.4,0,.2,1),opacity .6s ease;will-change:transform,opacity}
+.face-current{transform:rotateY(0deg);opacity:1;pointer-events:all;z-index:2}
+.face-entering{transform:rotateY(90deg);opacity:0;pointer-events:none;z-index:1}
+.face-leaving{transform:rotateY(-90deg);opacity:0;pointer-events:none;z-index:1}
+.face-standby{transform:rotateY(90deg);opacity:0;pointer-events:none;z-index:0}
+.q-tag{font-size:.68rem;font-family:'JetBrains Mono',monospace;color:#60A5FA;background:rgba(96,165,250,.15);padding:.18rem .55rem;border-radius:999px;border:1px solid rgba(96,165,250,.25);display:inline-block;margin-bottom:.7rem;width:fit-content}
+.q-text{font-size:.88rem;line-height:1.55;color:#EEF0FF;margin-bottom:.8rem}
+.q-options{display:flex;flex-direction:column;gap:.38rem;flex:1}
+.q-opt{display:flex;align-items:center;gap:.6rem;padding:.42rem .75rem;border-radius:7px;background:#323B5C;border:1px solid transparent;font-size:.8rem;cursor:pointer;transition:border-color .15s,background .15s;color:#EEF0FF;user-select:none}
+.q-opt:hover:not(.locked){border-color:#8B5CF6;background:rgba(139,92,246,.15)}
+.q-opt.locked{cursor:default}
+.q-opt.picked-correct{border-color:var(--mint)!important;background:rgba(16,185,129,.12)!important}
+.q-opt.picked-wrong{border-color:#EF4444!important;background:rgba(239,68,68,.1)!important}
+.q-opt.reveal-correct{border-color:var(--mint)!important;background:rgba(16,185,129,.08)!important}
+.opt-letter{width:20px;height:20px;border-radius:4px;background:#1A1F35;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#9CA3C8;transition:background .15s,color .15s}
+.q-opt.picked-correct .opt-letter,.q-opt.reveal-correct .opt-letter{background:var(--mint);color:#fff}
+.q-opt.picked-wrong .opt-letter{background:#EF4444;color:#fff}
+.result-row{font-size:.78rem;margin-top:.55rem;padding:.42rem .75rem;border-radius:7px;display:none;align-items:center;gap:.5rem}
+.result-row.show{display:flex}
+.result-correct{background:rgba(52,211,153,.12);color:#34D399;border:1px solid rgba(52,211,153,.3)}
+.result-wrong{background:rgba(239,68,68,.08);color:#F87171;border:1px solid rgba(239,68,68,.2)}
+.next-btn{margin-top:.6rem;width:100%;padding:.48rem;border-radius:7px;background:#8B5CF6;border:none;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;display:none;transition:background .2s}
+.next-btn.show{display:block}
+.next-btn:hover{background:#7C3AED}
+.quiz-dots{display:flex;gap:.4rem;justify-content:center;margin-bottom:.6rem}
+.qdot{width:7px;height:7px;border-radius:50%;background:#323B5C;transition:background .3s}
+.qdot.active{background:#8B5CF6}
+.qdot.done{background:#34D399}
+.ai-tag{display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:#9CA3C8}
+.ai-dot{width:6px;height:6px;border-radius:50%;background:#34D399;flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+section{padding:5rem 3rem;max-width:1200px;margin:0 auto}
+.sec-label{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:#A78BFA;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.75rem}
+.sec-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(1.6rem,3vw,2.25rem);font-weight:800;line-height:1.2;margin-bottom:1rem}
+.sec-sub{color:#9CA3C8;font-size:1rem;max-width:560px}
+
+.who-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:3rem}
+.who-card{background:#242B45;border:1px solid #323B5C;border-radius:14px;padding:1.75rem}
+.who-icon{font-size:2rem;margin-bottom:1rem}
+.who-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:.75rem}
+.who-desc{font-size:.875rem;color:#9CA3C8;line-height:1.65}
+.who-pills{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1rem}
+.pill{font-size:.7rem;font-family:'JetBrains Mono',monospace;padding:.2rem .6rem;border-radius:999px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:#C4B5FD}
+
+.features{padding:5rem 3rem;background:#212840}
+.features-inner{max-width:1200px;margin:0 auto}
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;margin-top:3rem}
+.feature-card{background:#242B45;border:1px solid #323B5C;border-radius:14px;padding:1.5rem;transition:border-color .2s,transform .2s}
+.feature-card:hover{border-color:#8B5CF6;transform:translateY(-3px)}
+.feat-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:1rem}
+.feat-icon.pu{background:rgba(139,92,246,.2)}.feat-icon.bl{background:rgba(96,165,250,.2)}.feat-icon.mi{background:rgba(52,211,153,.2)}.feat-icon.am{background:rgba(251,191,36,.15)}
+.feat-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.5rem}
+.feat-desc{font-size:.875rem;color:#9CA3C8;line-height:1.6}
+
+.exam-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-top:2.5rem}
+.exam-card{background:#242B45;border:1px solid #323B5C;border-radius:12px;padding:1.25rem;display:flex;flex-direction:column;gap:.6rem;transition:border-color .2s}
+.exam-card:hover{border-color:#8B5CF6}
+.ecat{font-size:.7rem;font-family:'JetBrains Mono',monospace;padding:.2rem .55rem;border-radius:999px;display:inline-block;width:fit-content}
+.ec-c{background:rgba(139,92,246,.2);color:#C4B5FD}.ec-u{background:rgba(96,165,250,.2);color:#93C5FD}.ec-m{background:rgba(52,211,153,.2);color:#6EE7B7}.ec-t{background:rgba(251,191,36,.15);color:#FCD34D}
+.exam-name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.95rem}
+.exam-detail{font-size:.8rem;color:#9CA3C8}
+.exam-grades{font-size:.7rem;font-family:'JetBrains Mono',monospace;color:#6B7499}
+
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-top:3rem;position:relative}
+.steps::before{content:'';position:absolute;top:24px;left:calc(16.67% + 20px);right:calc(16.67% + 20px);height:1px;background:#323B5C}
+.step{text-align:center}
+.step-num{width:48px;height:48px;border-radius:50%;background:#8B5CF6;border:none;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:1rem;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem}
+.step-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;margin-bottom:.5rem}
+.step-desc{font-size:.875rem;color:#9CA3C8}
+
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:3rem}
+.plan-card{background:#242B45;border:1px solid #323B5C;border-radius:16px;padding:2rem 1.5rem;position:relative}
+.plan-card.feat{border-color:#8B5CF6;box-shadow:0 8px 40px rgba(139,92,246,.2)}
+.plan-badge{position:absolute;top:1.25rem;right:1.25rem;background:var(--purple);color:#fff;font-size:.7rem;font-weight:700;padding:.2rem .65rem;border-radius:999px;font-family:'Plus Jakarta Sans',sans-serif}
+.plan-for{font-size:.75rem;font-family:'JetBrains Mono',monospace;color:#9CA3C8;margin-bottom:.5rem}
+.plan-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.2rem;font-weight:800;margin-bottom:1.25rem}
+.plan-price{font-family:'Plus Jakarta Sans',sans-serif;font-size:2.25rem;font-weight:800;margin-bottom:.25rem}
+.plan-price sub{font-size:1rem;vertical-align:baseline;color:#9CA3C8}
+.plan-cycle{font-size:.8rem;color:#9CA3C8;margin-bottom:1.5rem}
+.plan-feats{list-style:none;display:flex;flex-direction:column;gap:.7rem;margin-bottom:1.75rem}
+.plan-feats li{display:flex;align-items:flex-start;gap:.6rem;font-size:.875rem;color:#9CA3C8}
+.plan-feats li::before{content:'✓';color:#34D399;font-weight:700;flex-shrink:0;margin-top:1px}
+.plan-btn{width:100%;padding:.75rem;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;border:none;transition:opacity .2s}
+.plan-btn:hover{opacity:.85}
+.plan-btn.o{background:transparent;border:1px solid #323B5C;color:#EEF0FF}
+.plan-btn.f{background:#8B5CF6;color:#fff}
+
+
+.cta-banner{text-align:center;padding:6rem 3rem;background:linear-gradient(135deg,#4C1D95 0%,#1E3A8A 100%);border-top:1px solid #323B5C}
+.cta-banner h2{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(1.8rem,3.5vw,2.75rem);font-weight:800;margin-bottom:1rem;color:#fff}
+.cta-banner p{color:rgba(255,255,255,.8);margin-bottom:2rem}
+.cta-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+
+
+.community-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:3rem;align-items:start}
+.community-hero-card{background:linear-gradient(135deg,rgba(139,92,246,.25) 0%,rgba(96,165,250,.15) 100%);border:1px solid rgba(139,92,246,.4);border-radius:18px;padding:2rem;position:relative;overflow:hidden}
+.community-hero-card::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.2) 0%,transparent 70%);pointer-events:none}
+.ch-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.ch-icon{font-size:2.5rem}
+.ch-badge{background:#8B5CF6;color:#fff;font-size:.7rem;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;padding:.3rem .8rem;border-radius:999px}
+.ch-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:.75rem;color:#EEF0FF}
+.ch-desc{font-size:.875rem;color:#9CA3C8;line-height:1.7;margin-bottom:1.5rem}
+.ch-stats{display:flex;gap:1.5rem;padding-top:1.25rem;border-top:1px solid rgba(139,92,246,.25)}
+.ch-stat-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.5rem;font-weight:800;color:#C4B5FD}
+.ch-stat-label{font-size:.75rem;color:#9CA3C8;margin-top:.1rem}
+.community-cards{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.comm-card{background:#242B45;border:1px solid #323B5C;border-radius:14px;padding:1.25rem;transition:border-color .2s,transform .2s}
+.comm-card:hover{border-color:#8B5CF6;transform:translateY(-2px)}
+.comm-icon{font-size:1.6rem;margin-bottom:.65rem}
+.comm-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;font-weight:700;margin-bottom:.4rem;color:#EEF0FF}
+.comm-desc{font-size:.8rem;color:#9CA3C8;line-height:1.6}
+@media(max-width:900px){.community-grid{grid-template-columns:1fr}.community-cards{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.community-cards{grid-template-columns:1fr}}
+
+.parent-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:3rem}
+.parent-card{background:#242B45;border:1px solid #323B5C;border-radius:14px;padding:1.5rem;transition:border-color .2s,transform .2s}
+.parent-card:hover{border-color:#60A5FA;transform:translateY(-3px)}
+.parent-icon{font-size:1.75rem;margin-bottom:.85rem}
+.parent-feat-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:.95rem;font-weight:700;margin-bottom:.45rem}
+.parent-feat-desc{font-size:.85rem;color:#9CA3C8;line-height:1.6}
+@media(max-width:900px){.parent-grid{grid-template-columns:1fr}}
+
+footer{background:#212840;padding:3rem;border-top:1px solid #323B5C;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;font-size:.8rem;color:#9CA3C8}
+.footer-links{display:flex;gap:1.5rem}
+.footer-links a{color:#9CA3C8;text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:#C4B5FD}
+
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;gap:2.5rem;padding:3rem 1.5rem}
+  nav{padding:1rem 1.5rem}
+  .nav-links{display:none}
+  section,.features,.cta-banner{padding:3rem 1.5rem}
+  .steps,.pricing-grid,.who-grid{grid-template-columns:1fr}
+  .steps::before{display:none}
+  footer{padding:2rem 1.5rem;flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+
+<nav>
+  <div class="logo">Intelli<span>Prep</span></div>
+  <ul class="nav-links">
+    <li><a href="#">Features</a></li>
+    <li><a href="#">Exams</a></li>
+    <li><a href="#">For Parents</a></li>
+    <li><a href="#">Pricing</a></li>
+  </ul>
+  <div class="nav-cta">
+    <button class="btn-ghost" onclick="openModal('authModal')">Sign in</button>
+    <button class="btn-primary" onclick="openModal('authModal')">Start free trial</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div>
+    <div class="hero-eyebrow">AI-Powered Exam Preparation</div>
+    <h1>Ace every exam with <span class="ac">AI-generated</span> practice from your <span class="ac2">own PDFs</span></h1>
+    <p class="hero-sub">Upload any textbook or study guide and get unlimited, curriculum-aligned questions for SAT, ACT, AP exams, state tests, and more — built for US schools, tutoring centers, and families.</p>
+    <div class="hero-actions">
+      <button class="btn-lg p" onclick="openModal('examModal')">Get started free</button>
+      <button class="btn-lg s" onclick="openModal('demoModal')">Watch demo →</button>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-num">48K+</div><div class="stat-label">Questions generated</div></div>
+      <div><div class="stat-num">23</div><div class="stat-label">Schools onboarded</div></div>
+      <div><div class="stat-num">4.8 / 5</div><div class="stat-label">Avg. user rating</div></div>
+    </div>
+  </div>
+
+  <div class="hero-demo">
+    <div class="demo-header">
+      <div class="demo-icon">🤖</div>
+      <div><div class="demo-title">AI Question Engine</div><div class="demo-sub">Generated from uploaded PDF</div></div>
+      <div class="demo-badge">● LIVE</div>
+    </div>
+    <div class="cube-scene" id="cubeScene"></div>
+    <div class="quiz-dots" id="quizDots"></div>
+    <div class="ai-tag"><div class="ai-dot"></div><span id="aiSource"></span></div>
+  </div>
+</div>
+
+<section>
+  <div class="sec-label">Who it's for</div>
+  <div class="sec-title">One platform, every learner</div>
+  <p class="sec-sub">Whether you're running a school, a coaching institute, or prepping solo — IntelliPrep adapts to your workflow.</p>
+  <div class="who-grid">
+    <div class="who-card"><div class="who-icon">🏫</div><div class="who-title">Schools</div><div class="who-desc">Upload your entire curriculum and let the AI generate chapter-wise tests, mid-terms, and final exams aligned to your syllabus — automatically.</div><div class="who-pills"><div class="pill">Admin dashboard</div><div class="pill">Class management</div><div class="pill">Progress reports</div></div></div>
+    <div class="who-card"><div class="who-icon">🎯</div><div class="who-title">Tutoring Centers</div><div class="who-desc">Run live SAT, ACT, AP, and state test mock exams for your students. Set time limits, track batch performance, and send parents weekly progress reports.</div><div class="who-pills"><div class="pill">Live mock exams</div><div class="pill">Leaderboards</div><div class="pill">Batch analytics</div><div class="pill">Parent reports</div></div></div>
+    <div class="who-card"><div class="who-icon">👨‍👩‍👧</div><div class="who-title">Parents & Families</div><div class="who-desc">Give your child a private tutor in their pocket. Upload their textbook, pick the exam they're prepping for, and watch their confidence grow — with weekly reports sent straight to you.</div><div class="who-pills"><div class="pill">Parent dashboard</div><div class="pill">Weekly email reports</div><div class="pill">Safe for all ages</div><div class="pill">No tutor needed</div></div></div>
+  </div>
+</section>
+
+<div class="features">
+  <div class="features-inner">
+    <div class="sec-label">Core features</div>
+    <div class="sec-title">Everything you need to prepare smarter</div>
+    <div class="feature-grid">
+      <div class="feature-card"><div class="feat-icon pu">📄</div><div class="feat-title">PDF-to-Questions AI</div><div class="feat-desc">Upload any textbook, notes, or syllabus PDF and get MCQs, short-answer, and true/false questions generated in seconds.</div></div>
+      <div class="feature-card"><div class="feat-icon bl">🏆</div><div class="feat-title">Timed Exam Simulations</div><div class="feat-desc">Full-length timed mock exams replicating real SAT, ACT, AP, AMC, and state test conditions — with authentic scoring and section breakdowns.</div></div>
+      <div class="feature-card"><div class="feat-icon mi">🧠</div><div class="feat-title">AI Explanations</div><div class="feat-desc">Every wrong answer comes with a step-by-step AI explanation so students learn, not just practice.</div></div>
+      <div class="feature-card"><div class="feat-icon am">📊</div><div class="feat-title">Detailed Analytics</div><div class="feat-desc">Track weak topics, time-per-question, and score trends. Teachers get class-wide heat maps and improvement reports.</div></div>
+      <div class="feature-card"><div class="feat-icon pu">🎓</div><div class="feat-title">Grade-Level Adaptive</div><div class="feat-desc">Questions auto-adjust to your child's grade — from 3rd-grade state reading tests all the way to AP and SAT college prep.</div></div>
+      <div class="feature-card"><div class="feat-icon bl">🔒</div><div class="feat-title">Secure Exam Proctoring</div><div class="feat-desc">Browser lock, tab-switch detection, and timer enforcement ensure fair assessments in coaching and school settings.</div></div>
+      <div class="feature-card"><div class="feat-icon mi">🌎</div><div class="feat-title">Weekly Global Mock Exams</div><div class="feat-desc">Every Monday, a new live mock exam drops — open to all IntelliPrep users worldwide. Compete on the same test, same time, and see where your score lands globally.</div></div>
+      <div class="feature-card"><div class="feat-icon am">🏅</div><div class="feat-title">Achievement Bulletin Board</div><div class="feat-desc">Top scores, personal bests, and streaks get celebrated on a public board. Students see their name in lights — motivation that actually works.</div></div>
+      <div class="feature-card"><div class="feat-icon pu">📈</div><div class="feat-title">Global Score Percentiles</div><div class="feat-desc">After every mock, students see exactly how they rank against peers nationally and globally — not just a raw score, but real context for college planning.</div></div>
+      <div class="feature-card"><div class="feat-icon bl">🔥</div><div class="feat-title">Study Streaks & Rewards</div><div class="feat-desc">Daily practice streaks, badges, and milestone rewards keep students coming back — making test prep feel less like a chore and more like a game.</div></div>
+      <div class="feature-card"><div class="feat-icon mi">👥</div><div class="feat-title">School vs. School Challenges</div><div class="feat-desc">Schools can opt into friendly monthly challenges — compare aggregate scores against other schools and celebrate your students' collective progress.</div></div>
+      <div class="feature-card"><div class="feat-icon am">📅</div><div class="feat-title">Exam Countdown Calendar</div><div class="feat-desc">Sync real SAT, ACT, and AP exam dates. IntelliPrep auto-builds a study schedule counting down to your student's actual test day.</div></div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="sec-label">Community &amp; Competition</div>
+  <div class="sec-title">More than practice — it's a movement</div>
+  <p class="sec-sub">IntelliPrep connects students across schools and states in friendly, motivating competition that makes studying addictive.</p>
+  <div class="community-grid">
+
+    <div class="community-hero-card">
+      <div class="ch-top">
+        <div class="ch-icon">🌎</div>
+        <div class="ch-badge">Every Monday</div>
+      </div>
+      <div class="ch-title">Weekly Global Mock Exam</div>
+      <div class="ch-desc">One test. One day. Students everywhere. Every Monday at 9 AM ET, a new timed mock goes live — SAT Math one week, ACT English the next. Anyone on IntelliPrep can take it, and results are ranked in real time on the global leaderboard.</div>
+      <div class="ch-stats">
+        <div class="ch-stat"><div class="ch-stat-num">1,200+</div><div class="ch-stat-label">Students last Monday</div></div>
+        <div class="ch-stat"><div class="ch-stat-num">47</div><div class="ch-stat-label">States represented</div></div>
+        <div class="ch-stat"><div class="ch-stat-num">Free</div><div class="ch-stat-label">For all users</div></div>
+      </div>
+    </div>
+
+    <div class="community-cards">
+      <div class="comm-card">
+        <div class="comm-icon">🏅</div>
+        <div class="comm-title">Achievement Bulletin Board</div>
+        <div class="comm-desc">Personal bests, top streaks, and perfect scores get pinned publicly — giving every student a moment to shine and a reason to push harder.</div>
+      </div>
+      <div class="comm-card">
+        <div class="comm-icon">📈</div>
+        <div class="comm-title">Global Percentile Rankings</div>
+        <div class="comm-desc">See exactly where your score stands — not just in your class, but among thousands of students nationwide. Real context for real college planning.</div>
+      </div>
+      <div class="comm-card">
+        <div class="comm-icon">🏫</div>
+        <div class="comm-title">School vs. School Challenges</div>
+        <div class="comm-desc">Monthly team challenges pit schools against each other on the same mock exam. Friendly rivalry, serious preparation.</div>
+      </div>
+      <div class="comm-card">
+        <div class="comm-icon">🔥</div>
+        <div class="comm-title">Streaks &amp; Badges</div>
+        <div class="comm-desc">Daily practice streaks, subject mastery badges, and milestone rewards make consistent study feel rewarding — not punishing.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <div class="sec-label">Supported exams</div>
+  <div class="sec-title">Every competitive exam, covered</div>
+  <p class="sec-sub">From 3rd-grade state tests to AP and college entrance exams — every major US assessment, covered.</p>
+  <div class="exam-grid">
+    <div class="exam-card"><div class="ecat ec-u">College Prep</div><div class="exam-name">SAT</div><div class="exam-detail">College Board entrance exam</div><div class="exam-grades">Grades 10–12</div></div>
+    <div class="exam-card"><div class="ecat ec-u">College Prep</div><div class="exam-name">ACT</div><div class="exam-detail">College admission test</div><div class="exam-grades">Grades 10–12</div></div>
+    <div class="exam-card"><div class="ecat ec-u">College Prep</div><div class="exam-name">PSAT / NMSQT</div><div class="exam-detail">National Merit Scholarship qualifier</div><div class="exam-grades">Grades 8–10</div></div>
+    <div class="exam-card"><div class="ecat ec-c">Advanced</div><div class="exam-name">AP Exams</div><div class="exam-detail">20+ subjects covered</div><div class="exam-grades">Grades 10–12</div></div>
+    <div class="exam-card"><div class="ecat ec-t">Math</div><div class="exam-name">AMC 8 / 10 / 12</div><div class="exam-detail">American Math Competition</div><div class="exam-grades">Grades 5–12</div></div>
+    <div class="exam-card"><div class="ecat ec-c">Science</div><div class="exam-name">Science Olympiad</div><div class="exam-detail">Team science competition</div><div class="exam-grades">Grades 6–12</div></div>
+    <div class="exam-card"><div class="ecat ec-m">State Tests</div><div class="exam-name">STAAR / CAASPP / PARCC</div><div class="exam-detail">State standardized assessments</div><div class="exam-grades">Grades 3–8</div></div>
+    <div class="exam-card"><div class="ecat ec-t">Math</div><div class="exam-name">Math Kangaroo</div><div class="exam-detail">International math competition</div><div class="exam-grades">Grades 1–12</div></div>
+    <div class="exam-card"><div class="ecat ec-c">Olympiad</div><div class="exam-name">Math Olympiad (MATHCOUNTS)</div><div class="exam-detail">US national math competition</div><div class="exam-grades">Grades 6–8</div></div>
+    <div class="exam-card"><div class="ecat ec-c">Custom</div><div class="exam-name">Upload Any Material</div><div class="exam-detail">Your textbook, your quiz</div><div class="exam-grades">All grades</div></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-label">For parents</div>
+  <div class="sec-title">The smartest investment in your child's future</div>
+  <p class="sec-sub">You don't need to be a math whiz or test-prep expert. IntelliPrep does the heavy lifting — you just watch the progress.</p>
+  <div class="parent-grid">
+    <div class="parent-card">
+      <div class="parent-icon">📬</div>
+      <div class="parent-feat-title">Weekly Progress Reports</div>
+      <div class="parent-feat-desc">Get a clear email every Sunday showing which topics your child nailed and where they need more practice — no login required.</div>
+    </div>
+    <div class="parent-card">
+      <div class="parent-icon">🎯</div>
+      <div class="parent-feat-title">Know Exactly What They're Struggling With</div>
+      <div class="parent-feat-desc">See a topic-by-topic breakdown — not just a score. Know if it's fractions, reading inference, or essay structure that needs work.</div>
+    </div>
+    <div class="parent-card">
+      <div class="parent-icon">💸</div>
+      <div class="parent-feat-title">A Fraction of Tutoring Costs</div>
+      <div class="parent-feat-desc">Private SAT tutors average $100–$200/hour. IntelliPrep gives your child unlimited, AI-powered practice for less than the cost of one session.</div>
+    </div>
+    <div class="parent-card">
+      <div class="parent-icon">🕐</div>
+      <div class="parent-feat-title">Fits Any Schedule</div>
+      <div class="parent-feat-desc">10 minutes before school or 30 minutes on a Sunday — your child can practice on their own time, on any device, without you having to coordinate anything.</div>
+    </div>
+    <div class="parent-card">
+      <div class="parent-icon">🔒</div>
+      <div class="parent-feat-title">Safe & COPPA-Compliant</div>
+      <div class="parent-feat-desc">No ads, no social features, no data sold. IntelliPrep is built with student privacy first and is fully compliant with COPPA and FERPA.</div>
+    </div>
+    <div class="parent-card">
+      <div class="parent-icon">🧠</div>
+      <div class="parent-feat-title">Builds Real Understanding</div>
+      <div class="parent-feat-desc">Every wrong answer comes with a plain-English AI explanation — so your child learns the concept, not just the answer. No more cramming.</div>
+    </div>
+  </div>
+</section>
+
+<div class="features">
+  <div class="features-inner">
+    <div class="sec-label">How it works</div>
+    <div class="sec-title">From PDF to practice test in 60 seconds</div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-title">Upload your PDF</div><div class="step-desc">Drag in any textbook chapter, study guide, or past paper. Works with any language.</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-title">AI generates questions</div><div class="step-desc">Choose exam type, difficulty, and number of questions. Our AI builds a full test in under a minute.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-title">Practice and improve</div><div class="step-desc">Take the test, get instant AI explanations, review analytics, and schedule the next session.</div></div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="sec-label">Pricing</div>
+  <div class="sec-title">Simple plans for every use case</div>
+  <div class="pricing-grid">
+    <div class="plan-card">
+      <div class="plan-for">For students</div><div class="plan-name">Individual</div>
+      <div class="plan-price">$9<sub>/mo</sub></div><div class="plan-cycle">Billed monthly</div>
+      <ul class="plan-feats"><li>Unlimited PDF uploads</li><li>500 AI questions/month</li><li>5 competitive exam modes</li><li>AI explanations and hints</li><li>Personal analytics dashboard</li></ul>
+      <button class="plan-btn o" onclick="openModal('authModal')">Start free trial</button>
+    </div>
+    <div class="plan-card feat">
+      <div class="plan-badge">Most popular</div>
+      <div class="plan-for">For coaching centers</div><div class="plan-name">Coaching Pro</div>
+      <div class="plan-price">$79<sub>/mo</sub></div><div class="plan-cycle">Up to 50 students</div>
+      <ul class="plan-feats"><li>Everything in Individual</li><li>Unlimited questions</li><li>Live mock exam mode</li><li>Student leaderboards</li><li>Batch and cohort analytics</li><li>Custom exam branding</li><li>Priority support</li></ul>
+      <button class="plan-btn f" onclick="openModal('authModal')">Start free trial</button>
+    </div>
+    <div class="plan-card">
+      <div class="plan-for">For schools</div><div class="plan-name">School Enterprise</div>
+      <div class="plan-price">Custom</div><div class="plan-cycle">Unlimited students</div>
+      <ul class="plan-feats"><li>Everything in Coaching Pro</li><li>Dedicated teacher and admin dashboard</li><li>Teacher and admin dashboard</li><li>Secure single sign-on for all staff and students</li><li>Dedicated onboarding</li><li>SLA and compliance (FERPA/GDPR)</li></ul>
+      <button class="plan-btn o" onclick="openModal('contactModal')">Contact sales</button>
+    </div>
+  </div>
+</section>
+
+
+
+<div class="cta-banner">
+  <h2>Start generating smarter practice — today</h2>
+  <p>No credit card needed. Upload a PDF and get your first AI test in 60 seconds.</p>
+  <div class="cta-actions">
+    <button class="btn-lg p" onclick="openModal('examModal')">Get started free</button>
+    <button class="btn-lg s" onclick="openModal('contactModal')">Book a school demo</button>
+  </div>
+</div>
+
+<footer>
+  <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.1rem;font-weight:800;color:#C4B5FD">IntelliPrep</div>
+  <div class="footer-links"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Help</a><a href="#">Contact</a></div>
+  <div>© 2025 IntelliPrep. All rights reserved.</div>
+</footer>
+
+<script>
+(function() {
+  var questions = [
+    {
+      tag: 'SAT · Math · Algebra',
+      text: 'If 3x + 7 = 22, what is the value of 6x − 4?',
+      opts: ['24', '26', '30', '18'],
+      correct: 1,
+      explain: 'x = 5, so 6(5) − 4 = 26 ✓',
+      source: 'SAT Math prep — Linear equations'
+    },
+    {
+      tag: 'ACT · English · Grammar',
+      text: 'Choose the correct version: "Each of the students ___ submitted their essay."',
+      opts: ['have', 'has', 'are having', 'were having'],
+      correct: 1,
+      explain: '"Each" is singular, so the correct verb is "has" ✓',
+      source: 'ACT English prep — Subject-verb agreement'
+    },
+    {
+      tag: 'AP US History · Reconstruction Era',
+      text: 'Which constitutional amendment granted citizenship to formerly enslaved people?',
+      opts: ['13th Amendment', '14th Amendment', '15th Amendment', '16th Amendment'],
+      correct: 1,
+      explain: 'The 14th Amendment (1868) granted birthright citizenship ✓',
+      source: 'AP USH — Unit 5, Reconstruction'
+    },
+    {
+      tag: 'AMC 8 · Grade 6 · Number Theory',
+      text: 'What is the smallest positive integer divisible by both 6 and 9?',
+      opts: ['12', '18', '36', '54'],
+      correct: 1,
+      explain: 'LCM(6, 9) = 18 ✓',
+      source: 'AMC 8 prep — Divisibility and LCM'
+    },
+    {
+      tag: 'SAT · Reading · Inference',
+      text: 'A passage states a policy "reduced emissions 18% while GDP rose 3%." What can be inferred?',
+      opts: ['Growth requires emissions', 'Growth and emission cuts can coexist', 'Emissions cause GDP rises', 'The policy failed'],
+      correct: 1,
+      explain: 'Both metrics improved simultaneously, showing they can coexist ✓',
+      source: 'SAT Reading prep — Evidence-based inference'
+    }
+  ];
+
+  var current = 0;
+  var locked = false;
+  var animating = false;
+  var scene = document.getElementById('cubeScene');
+  var dotsEl = document.getElementById('quizDots');
+  var sourceEl = document.getElementById('aiSource');
+
+  function makeDots() {
+    dotsEl.innerHTML = '';
+    for (var i = 0; i < questions.length; i++) {
+      var d = document.createElement('div');
+      d.className = 'qdot' + (i === 0 ? ' active' : '');
+      d.id = 'qdot' + i;
+      dotsEl.appendChild(d);
+    }
+  }
+
+  function makeCard(q, idx) {
+    var card = document.createElement('div');
+    card.className = 'cube-face face-standby';
+    card.id = 'card' + idx;
+
+    var tag = document.createElement('div');
+    tag.className = 'q-tag';
+    tag.textContent = q.tag;
+    card.appendChild(tag);
+
+    var qt = document.createElement('div');
+    qt.className = 'q-text';
+    qt.textContent = q.text;
+    card.appendChild(qt);
+
+    var optWrap = document.createElement('div');
+    optWrap.className = 'q-options';
+    var letters = ['A','B','C','D'];
+    var result = document.createElement('div');
+    result.className = 'result-row';
+    var nextBtn = document.createElement('button');
+    nextBtn.className = 'next-btn';
+    nextBtn.textContent = idx < questions.length - 1 ? 'Next question →' : 'Restart quiz ↺';
+
+    q.opts.forEach(function(o, oi) {
+      var opt = document.createElement('div');
+      opt.className = 'q-opt';
+      var letter = document.createElement('div');
+      letter.className = 'opt-letter';
+      letter.textContent = letters[oi];
+      opt.appendChild(letter);
+      opt.appendChild(document.createTextNode(' ' + o));
+      (function(chosenIdx) {
+        opt.addEventListener('click', function() {
+          if (locked) return;
+          locked = true;
+          var opts2 = card.querySelectorAll('.q-opt');
+          opts2.forEach(function(o2) { o2.classList.add('locked'); });
+          opts2[chosenIdx].classList.add(chosenIdx === q.correct ? 'picked-correct' : 'picked-wrong');
+          if (chosenIdx !== q.correct) opts2[q.correct].classList.add('reveal-correct');
+          result.classList.add('show');
+          if (chosenIdx === q.correct) {
+            result.className = 'result-row show result-correct';
+            result.textContent = '✓ Correct — ' + q.explain;
+          } else {
+            result.className = 'result-row show result-wrong';
+            result.textContent = '✗ Incorrect — ' + q.explain;
+          }
+          nextBtn.classList.add('show');
+          document.getElementById('qdot' + idx).classList.add('done');
+        });
+      })(oi);
+      optWrap.appendChild(opt);
+    });
+
+    card.appendChild(optWrap);
+    card.appendChild(result);
+
+    nextBtn.addEventListener('click', function() { if (!animating) advance(idx); });
+    card.appendChild(nextBtn);
+    return card;
+  }
+
+  function advance(fromIdx) {
+    if (animating) return;
+    animating = true;
+    locked = false;
+    var nextIdx = (fromIdx + 1) % questions.length;
+    var outCard = document.getElementById('card' + fromIdx);
+    var inCard = document.getElementById('card' + nextIdx);
+
+    if (!inCard) {
+      inCard = makeCard(questions[nextIdx], nextIdx);
+      scene.appendChild(inCard);
+    }
+
+    inCard.className = 'cube-face face-entering';
+
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        outCard.className = 'cube-face face-leaving';
+        inCard.className = 'cube-face face-current';
+
+        var dots = dotsEl.querySelectorAll('.qdot');
+        dots.forEach(function(d) { d.classList.remove('active'); });
+        if (nextIdx === 0) { dots.forEach(function(d) { d.classList.remove('done'); }); }
+        document.getElementById('qdot' + nextIdx).classList.add('active');
+        sourceEl.textContent = 'AI generated from ' + questions[nextIdx].source;
+        current = nextIdx;
+
+        setTimeout(function() {
+          outCard.className = 'cube-face face-standby';
+          animating = false;
+        }, 700);
+      });
+    });
+  }
+
+  makeDots();
+  var first = makeCard(questions[0], 0);
+  first.className = 'cube-face face-current';
+  scene.appendChild(first);
+  sourceEl.textContent = 'AI generated from ' + questions[0].source;
+})();
+</script>
+
+<style>
+/* MODAL OVERLAY */
+.modal-overlay{position:fixed;inset:0;background:rgba(10,13,26,.85);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .25s ease}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{background:#242B45;border:1px solid #323B5C;border-radius:20px;padding:2.5rem;width:100%;max-width:480px;position:relative;transform:translateY(24px);transition:transform .3s ease;max-height:90vh;overflow-y:auto}
+.modal-overlay.open .modal-box{transform:translateY(0)}
+.modal-close{position:absolute;top:1.25rem;right:1.25rem;background:transparent;border:none;color:#9CA3C8;font-size:1.4rem;cursor:pointer;line-height:1;padding:.25rem .5rem;border-radius:6px;transition:color .15s,background .15s}
+.modal-close:hover{color:#EEF0FF;background:#323B5C}
+.modal-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.4rem;font-weight:800;color:#EEF0FF;margin-bottom:.35rem}
+.modal-sub{font-size:.875rem;color:#9CA3C8;margin-bottom:1.75rem}
+
+/* AUTH TABS */
+.auth-tabs{display:flex;background:#1A1F35;border-radius:10px;padding:.3rem;margin-bottom:1.5rem}
+.auth-tab{flex:1;padding:.55rem;border:none;background:transparent;color:#9CA3C8;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.875rem;border-radius:7px;cursor:pointer;transition:background .2s,color .2s}
+.auth-tab.active{background:#8B5CF6;color:#fff}
+
+/* FORM */
+.form-group{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.1rem}
+.form-label{font-size:.8rem;font-weight:600;color:#9CA3C8;font-family:'Plus Jakarta Sans',sans-serif}
+.form-input{background:#1A1F35;border:1px solid #323B5C;border-radius:8px;padding:.7rem 1rem;color:#EEF0FF;font-family:'Inter',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s;width:100%}
+.form-input:focus{border-color:#8B5CF6}
+.form-input::placeholder{color:#4B5568}
+textarea.form-input{resize:vertical;min-height:100px}
+.form-submit{width:100%;padding:.8rem;border-radius:10px;background:#8B5CF6;border:none;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:background .2s;margin-top:.5rem}
+.form-submit:hover{background:#7C3AED}
+.form-divider{text-align:center;color:#4B5568;font-size:.8rem;margin:.75rem 0;position:relative}
+.form-divider::before,.form-divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:#323B5C}
+.form-divider::before{left:0}.form-divider::after{right:0}
+.social-btn{width:100%;padding:.7rem;border-radius:10px;background:#1A1F35;border:1px solid #323B5C;color:#EEF0FF;font-family:'Plus Jakarta Sans',sans-serif;font-size:.875rem;font-weight:600;cursor:pointer;transition:border-color .2s;margin-bottom:.6rem;display:flex;align-items:center;justify-content:center;gap:.6rem}
+.social-btn:hover{border-color:#8B5CF6}
+.success-msg{text-align:center;padding:2rem 1rem}
+.success-icon{font-size:3rem;margin-bottom:1rem}
+.success-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.2rem;font-weight:800;color:#EEF0FF;margin-bottom:.5rem}
+.success-desc{font-size:.875rem;color:#9CA3C8}
+
+/* DEMO MODAL */
+.demo-modal-box{max-width:700px}
+.video-placeholder{background:#1A1F35;border:1px solid #323B5C;border-radius:14px;aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.25rem;cursor:pointer;transition:border-color .2s;position:relative;overflow:hidden}
+.video-placeholder:hover{border-color:#8B5CF6}
+.play-btn{width:72px;height:72px;border-radius:50%;background:#8B5CF6;display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 0 40px rgba(139,92,246,.5);transition:transform .2s}
+.video-placeholder:hover .play-btn{transform:scale(1.1)}
+.video-label{font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:700;color:#EEF0FF}
+.video-sub{font-size:.8rem;color:#9CA3C8}
+.demo-features{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.demo-feat{background:#1A1F35;border:1px solid #323B5C;border-radius:10px;padding:.85rem 1rem;display:flex;align-items:center;gap:.65rem;font-size:.82rem;color:#9CA3C8}
+.demo-feat-icon{font-size:1.1rem;flex-shrink:0}
+
+/* EXAM MODAL */
+.exam-modal-box{max-width:600px}
+.exam-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #323B5C}
+.exam-title-row{display:flex;flex-direction:column;gap:.2rem}
+.exam-modal-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.1rem;font-weight:800;color:#EEF0FF}
+.exam-modal-sub{font-size:.75rem;color:#9CA3C8;font-family:'JetBrains Mono',monospace}
+.exam-timer{font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:#34D399;background:#064E3B;padding:.35rem .9rem;border-radius:8px;min-width:80px;text-align:center}
+.exam-timer.urgent{color:#F87171;background:rgba(239,68,68,.15)}
+.exam-progress-bar{height:4px;background:#1A1F35;border-radius:999px;margin-bottom:1.5rem;overflow:hidden}
+.exam-progress-fill{height:100%;background:linear-gradient(90deg,#8B5CF6,#60A5FA);border-radius:999px;transition:width .4s ease}
+.exam-q-num{font-size:.75rem;font-family:'JetBrains Mono',monospace;color:#9CA3C8;margin-bottom:.5rem}
+.exam-q-text{font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:600;color:#EEF0FF;line-height:1.55;margin-bottom:1.25rem}
+.exam-opts{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+.exam-opt{display:flex;align-items:center;gap:.75rem;padding:.6rem .9rem;border-radius:9px;background:#1A1F35;border:1px solid #323B5C;cursor:pointer;transition:border-color .15s,background .15s;color:#EEF0FF;font-size:.9rem;user-select:none}
+.exam-opt:hover:not(.elocked){border-color:#8B5CF6;background:rgba(139,92,246,.1)}
+.exam-opt.elocked{cursor:default}
+.exam-opt.e-correct{border-color:#34D399;background:rgba(52,211,153,.1)}
+.exam-opt.e-wrong{border-color:#F87171;background:rgba(248,113,113,.08)}
+.exam-opt-letter{width:28px;height:28px;border-radius:6px;background:#242B45;font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#9CA3C8;transition:background .15s,color .15s;font-family:'JetBrains Mono',monospace}
+.exam-opt.e-correct .exam-opt-letter{background:#34D399;color:#fff}
+.exam-opt.e-wrong .exam-opt-letter{background:#F87171;color:#fff}
+.exam-explain{font-size:.8rem;padding:.65rem .9rem;border-radius:8px;margin-bottom:.75rem;display:none;line-height:1.6}
+.exam-explain.show{display:block}
+.exam-explain.correct-ex{background:rgba(52,211,153,.1);color:#6EE7B7;border:1px solid rgba(52,211,153,.25)}
+.exam-explain.wrong-ex{background:rgba(248,113,113,.07);color:#FCA5A5;border:1px solid rgba(248,113,113,.2)}
+.exam-next-btn{width:100%;padding:.7rem;border-radius:9px;background:#8B5CF6;border:none;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;display:none;transition:background .2s}
+.exam-next-btn.show{display:block}
+.exam-next-btn:hover{background:#7C3AED}
+.exam-results{text-align:center;padding:1rem 0}
+.exam-score-ring{width:120px;height:120px;margin:0 auto 1.25rem;position:relative}
+.exam-score-ring svg{transform:rotate(-90deg)}
+.exam-score-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.exam-score-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.75rem;font-weight:800;color:#EEF0FF}
+.exam-score-label{font-size:.7rem;color:#9CA3C8}
+.exam-result-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.2rem;font-weight:800;color:#EEF0FF;margin-bottom:.5rem}
+.exam-result-sub{font-size:.875rem;color:#9CA3C8;margin-bottom:1.5rem}
+.exam-result-btns{display:flex;gap:.75rem;justify-content:center}
+.exam-result-btn{padding:.65rem 1.5rem;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.875rem;font-weight:700;cursor:pointer;border:none;transition:background .2s}
+.exam-result-btn.primary{background:#8B5CF6;color:#fff}
+.exam-result-btn.primary:hover{background:#7C3AED}
+.exam-result-btn.secondary{background:#1A1F35;border:1px solid #323B5C;color:#EEF0FF}
+.exam-result-btn.secondary:hover{border-color:#8B5CF6}
+</style>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('authModal')">✕</button>
+    <div class="modal-title">Welcome to IntelliPrep</div>
+    <div class="modal-sub">Join thousands of students preparing smarter.</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="loginTab" onclick="switchTab('login')">Sign in</button>
+      <button class="auth-tab" id="signupTab" onclick="switchTab('signup')">Create account</button>
+    </div>
+    <div id="loginForm">
+      <button class="social-btn">🔵 Continue with Google</button>
+      <div class="form-divider">or</div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="you@email.com" /></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" placeholder="••••••••" /></div>
+      <button class="form-submit" onclick="showSuccess('authModal','🎉','You're signed in!','Welcome back. Redirecting to your dashboard...')">Sign in</button>
+    </div>
+    <div id="signupForm" style="display:none">
+      <button class="social-btn">🔵 Continue with Google</button>
+      <div class="form-divider">or</div>
+      <div class="form-group"><label class="form-label">Full name</label><input class="form-input" type="text" placeholder="Jane Smith" /></div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="you@email.com" /></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" placeholder="Min. 8 characters" /></div>
+      <button class="form-submit" onclick="showSuccess('authModal','🚀','Account created!','Welcome to IntelliPrep. Your journey starts now.')">Create account</button>
+    </div>
+    <div id="authSuccess" style="display:none">
+      <div class="success-msg"><div class="success-icon" id="authIcon"></div><div class="success-title" id="authTitle"></div><div class="success-desc" id="authDesc"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT / SCHOOL DEMO MODAL -->
+<div class="modal-overlay" id="contactModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('contactModal')">✕</button>
+    <div id="contactForm">
+      <div class="modal-title">Get in touch</div>
+      <div class="modal-sub">Tell us about your school or organization and we'll reach out within one business day.</div>
+      <div class="form-group"><label class="form-label">Full name</label><input class="form-input" type="text" placeholder="Jane Smith" /></div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="jane@school.edu" /></div>
+      <div class="form-group"><label class="form-label">Organization</label><input class="form-input" type="text" placeholder="Lincoln High School" /></div>
+      <div class="form-group"><label class="form-label">Role</label>
+        <select class="form-input"><option value="">Select your role</option><option>School Administrator</option><option>Teacher</option><option>Tutoring Center Owner</option><option>Parent</option><option>Other</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Message</label><textarea class="form-input" placeholder="Tell us how you'd like to use IntelliPrep..."></textarea></div>
+      <button class="form-submit" onclick="showContactSuccess()">Send message</button>
+    </div>
+    <div id="contactSuccess" style="display:none">
+      <div class="success-msg"><div class="success-icon">📬</div><div class="success-title">Message sent!</div><div class="success-desc">Thanks for reaching out. Our team will get back to you within one business day.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- DEMO VIDEO MODAL -->
+<div class="modal-overlay" id="demoModal">
+  <div class="modal-box demo-modal-box">
+    <button class="modal-close" onclick="closeModal('demoModal')">✕</button>
+    <div class="modal-title">See IntelliPrep in action</div>
+    <div class="modal-sub">Watch how students, parents, and schools use IntelliPrep to prep smarter.</div>
+    <div class="video-placeholder" onclick="this.innerHTML='<iframe width='100%' height='100%' src='https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1' frameborder='0' allow='autoplay' allowfullscreen style='border-radius:14px;position:absolute;inset:0'></iframe>';this.style.padding='0'">
+      <div class="play-btn">▶</div>
+      <div class="video-label">IntelliPrep Product Demo</div>
+      <div class="video-sub">3 min overview · Click to play</div>
+    </div>
+    <div class="demo-features">
+      <div class="demo-feat"><div class="demo-feat-icon">📄</div>Upload any PDF and get questions in seconds</div>
+      <div class="demo-feat"><div class="demo-feat-icon">🏆</div>Timed mock exams with real scoring</div>
+      <div class="demo-feat"><div class="demo-feat-icon">🧠</div>AI explanations for every wrong answer</div>
+      <div class="demo-feat"><div class="demo-feat-icon">🌎</div>Compete globally every Monday</div>
+    </div>
+  </div>
+</div>
+
+<!-- EXAM MODAL -->
+<div class="modal-overlay" id="examModal">
+  <div class="modal-box exam-modal-box">
+    <button class="modal-close" onclick="closeExam()">✕</button>
+    <div id="examContent">
+      <div class="exam-header">
+        <div class="exam-title-row">
+          <div class="exam-modal-title">Math Olympiad Practice</div>
+          <div class="exam-modal-sub">Guest Mode · 5 Questions</div>
+        </div>
+        <div class="exam-timer" id="examTimer">05:00</div>
+      </div>
+      <div class="exam-progress-bar"><div class="exam-progress-fill" id="examProgress" style="width:0%"></div></div>
+      <div class="exam-q-num" id="examQNum">Question 1 of 5</div>
+      <div class="exam-q-text" id="examQText"></div>
+      <div class="exam-opts" id="examOpts"></div>
+      <div class="exam-explain" id="examExplain"></div>
+      <button class="exam-next-btn" id="examNextBtn" onclick="examNext()">Next question →</button>
+    </div>
+    <div id="examResults" style="display:none">
+      <div class="exam-results">
+        <div class="exam-score-ring">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="#1A1F35" stroke-width="10"/>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="#8B5CF6" stroke-width="10" stroke-linecap="round" id="scoreArc" stroke-dasharray="314" stroke-dashoffset="314"/>
+          </svg>
+          <div class="exam-score-text"><div class="exam-score-num" id="scoreFraction"></div><div class="exam-score-label">correct</div></div>
+        </div>
+        <div class="exam-result-title" id="resultTitle"></div>
+        <div class="exam-result-sub" id="resultSub"></div>
+        <div class="exam-result-btns">
+          <button class="exam-result-btn primary" onclick="restartExam()">Try again</button>
+          <button class="exam-result-btn secondary" onclick="closeModal('examModal');openModal('authModal')">Create free account</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// MODAL SYSTEM
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (id === 'examModal') startExam();
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeExam() {
+  clearInterval(examInterval);
+  closeModal('examModal');
+}
+document.querySelectorAll('.modal-overlay').forEach(function(el) {
+  el.addEventListener('click', function(e) {
+    if (e.target === el) { clearInterval(examInterval); closeModal(el.id); }
+  });
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    clearInterval(examInterval);
+    document.querySelectorAll('.modal-overlay.open').forEach(function(el) { closeModal(el.id); });
+  }
+});
+
+// AUTH TABS
+function switchTab(tab) {
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('loginTab').className = 'auth-tab' + (tab === 'login' ? ' active' : '');
+  document.getElementById('signupTab').className = 'auth-tab' + (tab === 'signup' ? ' active' : '');
+}
+
+function showSuccess(modalId, icon, title, desc) {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('signupForm').style.display = 'none';
+  document.getElementById('authIcon').textContent = icon;
+  document.getElementById('authTitle').textContent = title;
+  document.getElementById('authDesc').textContent = desc;
+  document.getElementById('authSuccess').style.display = 'block';
+  setTimeout(function() { closeModal(modalId); document.getElementById('authSuccess').style.display = 'none'; document.getElementById('loginForm').style.display = 'block'; }, 2500);
+}
+
+function showContactSuccess() {
+  document.getElementById('contactForm').style.display = 'none';
+  document.getElementById('contactSuccess').style.display = 'block';
+  setTimeout(function() { closeModal('contactModal'); document.getElementById('contactSuccess').style.display = 'none'; document.getElementById('contactForm').style.display = 'block'; }, 2500);
+}
+
+// EXAM
+var examQuestions = [
+  { text: 'What is the sum of all integers from 1 to 50?', opts: ['1225', '1275', '2500', '1250'], correct: 1, explain: 'Sum = n(n+1)/2 = 50×51/2 = 1275' },
+  { text: 'A triangle has sides 3, 4, and 5. What is its area?', opts: ['6', '7.5', '10', '12'], correct: 0, explain: 'It is a right triangle (3²+4²=5²). Area = ½×3×4 = 6' },
+  { text: 'If 2^x = 32, what is the value of x?', opts: ['4', '5', '6', '16'], correct: 1, explain: '2⁵ = 32, so x = 5' },
+  { text: 'How many prime numbers are less than 20?', opts: ['6', '7', '8', '9'], correct: 2, explain: 'Primes: 2,3,5,7,11,13,17,19 — that is 8 primes' },
+  { text: 'A circle has a circumference of 12π. What is its area?', opts: ['36π', '144π', '6π', '72π'], correct: 0, explain: 'C=2πr=12π so r=6. Area=πr²=36π' }
+];
+var examCurrent = 0, examScore = 0, examInterval = null, examLocked = false, examSeconds = 300;
+
+function startExam() {
+  examCurrent = 0; examScore = 0; examLocked = false; examSeconds = 300;
+  document.getElementById('examContent').style.display = 'block';
+  document.getElementById('examResults').style.display = 'none';
+  document.getElementById('examNextBtn').className = 'exam-next-btn';
+  renderExamQ();
+  clearInterval(examInterval);
+  examInterval = setInterval(function() {
+    examSeconds--;
+    var m = Math.floor(examSeconds / 60), s = examSeconds % 60;
+    var timer = document.getElementById('examTimer');
+    timer.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    timer.className = 'exam-timer' + (examSeconds <= 60 ? ' urgent' : '');
+    if (examSeconds <= 0) { clearInterval(examInterval); showExamResults(); }
+  }, 1000);
+}
+
+function renderExamQ() {
+  var q = examQuestions[examCurrent];
+  examLocked = false;
+  document.getElementById('examQNum').textContent = 'Question ' + (examCurrent + 1) + ' of ' + examQuestions.length;
+  document.getElementById('examQText').textContent = q.text;
+  document.getElementById('examProgress').style.width = (examCurrent / examQuestions.length * 100) + '%';
+  document.getElementById('examExplain').className = 'exam-explain';
+  document.getElementById('examExplain').textContent = '';
+  document.getElementById('examNextBtn').className = 'exam-next-btn';
+  var optsEl = document.getElementById('examOpts');
+  optsEl.innerHTML = '';
+  var letters = ['A','B','C','D'];
+  q.opts.forEach(function(o, oi) {
+    var opt = document.createElement('div');
+    opt.className = 'exam-opt';
+    opt.innerHTML = '<div class="exam-opt-letter">' + letters[oi] + '</div>' + o;
+    (function(chosen) {
+      opt.addEventListener('click', function() {
+        if (examLocked) return;
+        examLocked = true;
+        var opts = document.querySelectorAll('.exam-opt');
+        opts.forEach(function(o2) { o2.classList.add('elocked'); });
+        var isCorrect = chosen === q.correct;
+        if (isCorrect) examScore++;
+        opts[chosen].classList.add(isCorrect ? 'e-correct' : 'e-wrong');
+        if (!isCorrect) opts[q.correct].classList.add('e-correct');
+        var ex = document.getElementById('examExplain');
+        ex.textContent = (isCorrect ? '✓ Correct — ' : '✗ Incorrect — ') + q.explain;
+        ex.className = 'exam-explain show ' + (isCorrect ? 'correct-ex' : 'wrong-ex');
+        var nb = document.getElementById('examNextBtn');
+        nb.textContent = examCurrent < examQuestions.length - 1 ? 'Next question →' : 'See results';
+        nb.className = 'exam-next-btn show';
+      });
+    })(oi);
+    optsEl.appendChild(opt);
+  });
+}
+
+function examNext() {
+  examCurrent++;
+  if (examCurrent >= examQuestions.length) { clearInterval(examInterval); showExamResults(); }
+  else renderExamQ();
+}
+
+function showExamResults() {
+  document.getElementById('examContent').style.display = 'none';
+  document.getElementById('examResults').style.display = 'block';
+  var pct = examScore / examQuestions.length;
+  var offset = 314 - (314 * pct);
+  document.getElementById('scoreArc').setAttribute('stroke-dashoffset', offset);
+  document.getElementById('scoreArc').setAttribute('stroke', pct >= 0.8 ? '#34D399' : pct >= 0.6 ? '#FBBF24' : '#F87171');
+  document.getElementById('scoreFraction').textContent = examScore + '/' + examQuestions.length;
+  var titles = ['Keep practicing! 💪', 'Good effort! 📚', 'Well done! ⭐', 'Excellent! 🏆', 'Perfect score! 🎉'];
+  var subs = ['Every expert started as a beginner. Sign up to track your progress and improve.', 'You are getting there! Create an account to access 500+ more practice questions.', 'Strong performance! Sign up to unlock full Math Olympiad prep and more exams.', 'Outstanding! You are ready for the next level. Create your free account to continue.', 'Incredible! You aced it. Sign up to compete on the global leaderboard!'];
+  var idx = Math.min(examScore, 4);
+  document.getElementById('resultTitle').textContent = titles[idx];
+  document.getElementById('resultSub').textContent = subs[idx];
+  document.getElementById('examProgress').style.width = '100%';
+}
+
+function restartExam() {
+  startExam();
+}
+</script>
+
+</body>
+</html>
